@@ -38,40 +38,40 @@ signal RAM: ram_type ; -- := (0 => std_logic_vector(to_unsigned(2, 8)),
                        -- 2 => std_logic_vector(to_unsigned(75, 8)), 
                        -- others => (others => '0'));
 begin
-CMP: project_reti_logiche port map (
-    i_clk     => tb_clk,
-    i_start   => tb_start,
-    i_rst     => tb_rst,
-    i_data    => mem_o_data,
-    o_address => mem_address,
-    o_done    => tb_done,
-    o_en   	  => enable_wire,
-    o_we 	  => mem_we,
-    o_data    => mem_i_data 
-);
-
-CLK : process is
-begin
-    wait for c_CLOCK_PERIOD/2;
-    tb_clk <= not tb_clk;
-end process CLK;
-
-MEM : process(tb_clk)
-begin
-    if tb_clk'event and tb_clk = '1' then
-        if enable_wire = '1' then
-            if mem_we = '1' then
-                RAM(conv_integer(mem_address))  <= mem_i_data;
-                mem_o_data                      <= mem_i_data after 1 ns;
-            else
-                mem_o_data <= RAM(conv_integer(mem_address)) after 1 ns;
+    CMP: project_reti_logiche port map (
+        i_clk     => tb_clk,
+        i_start   => tb_start,
+        i_rst     => tb_rst,
+        i_data    => mem_o_data,
+        o_address => mem_address,
+        o_done    => tb_done,
+        o_en   	  => enable_wire,
+        o_we 	  => mem_we,
+        o_data    => mem_i_data 
+    );
+    
+    CLK : process is
+    begin
+        wait for c_CLOCK_PERIOD/2;
+        tb_clk <= not tb_clk;
+    end process CLK;
+    
+    MEM : process(tb_clk)
+    begin
+        if tb_clk'event and tb_clk = '1' then
+            if enable_wire = '1' then
+                if mem_we = '1' then
+                    RAM(conv_integer(mem_address))  <= mem_i_data;
+                    mem_o_data                      <= mem_i_data after 1 ns;
+                else
+                    mem_o_data <= RAM(conv_integer(mem_address)) after 1 ns;
+                end if;
             end if;
         end if;
-    end if;
-end process;
-
-TEST: process
-begin
--- TODO
-end process;
+    end process;
+    
+    TEST: process
+    begin
+    -- TODO
+    end process;
 end architecture;
