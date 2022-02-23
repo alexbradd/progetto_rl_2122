@@ -56,6 +56,8 @@ signal rst: std_logic;
 signal o_total: std_logic_vector(7 downto 0);
 signal o_word: std_logic_vector(7 downto 0);
 
+signal pre_conv_w: std_logic;
+
 signal o_bit3_counter: std_logic_vector(2 downto 0);
 signal o_bit9_counter: std_logic_vector(8 downto 0);
 signal o_shiftreg: std_logic_vector(7 downto 0);
@@ -72,11 +74,12 @@ begin
     count_clk <= i_clk and count_start;
     rst <= i_rst or conv_rst;
     
-    conv_w <= o_bit3_counter(1) and o_bit3_counter(0);
+    pre_conv_w <= o_bit3_counter(1) and o_bit3_counter(0);
+    conv_w <= pre_conv_w;
     conv_next <= o_bit3_counter(2) and o_bit3_counter(1) and o_bit3_counter(0);
 
     o_data <= o_shiftreg;
-    o_end <= std_logic(o_total = o_bit9_counter(8 downto 1));
+    o_end <= '1' when o_total = o_bit9_counter(8 downto 1) else '0';
 
     read_addr <= "00000000" & std_logic_vector(unsigned(o_bit9_counter(8 downto 1)) + 1);
     write_addr <= std_logic_vector(unsigned(o_bit9_counter) + 999);
@@ -128,11 +131,11 @@ begin
         end if;
     end process;
 
-    bit9_counter: process(conv_w, rst)
+    bit9_counter: process(pre_conv_w, rst)
     begin
         if (rst = '1') then
             o_bit9_counter <= "000000000";
-        elsif (conv_w'event and conv_w = '1') then
+        elsif (pre_conv_w'event and pre_conv_w = '1') then
             o_bit9_counter <= std_logic_vector(unsigned(o_bit9_counter) + 1);
         end if;
     end process;
