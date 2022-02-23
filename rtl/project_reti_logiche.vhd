@@ -34,69 +34,75 @@ entity datapath is
         i_clk: in std_logic;
         i_rst: in std_logic;
         i_data: in std_logic_vector(7 downto 0);
-        address_sel: in std_logic_vector(1 downto 0);
-        total_load: in std_logic;
-        word_load: in std_logic;
-        convolute_start: in std_logic;
-        convolute_rst: in std_logic;
-        convolute_w: out std_logic;
-        convolute_next: out std_logic;
+        addr_sel: in std_logic_vector(1 downto 0);
+        t_load: in std_logic;
+        w_load: in std_logic;
+        conv_start: in std_logic;
+        count_start: in std_logic;
+        conv_rst: in std_logic;
+        conv_w: out std_logic;
+        conv_next: out std_logic;
         o_address: out std_logic_vector(15 downto 0);
-        o_done: out std_logic;
+        o_end: out std_logic;
         o_data: out std_logic_vector(7 downto 0)
     );
 end datapath;
 
-architecture Behavioral of datapath is
+architecture Behavioural of datapath is
+signal conv_clk : std_logic;
+signal count_clk : std_logic;
+signal rst: std_logic;
+
 signal o_total: std_logic_vector(7 downto 0);
 signal o_word: std_logic_vector(7 downto 0);
-signal convolute_clk: std_logic;
 
 signal o_bit3_counter: std_logic_vector(2 downto 0);
 signal o_bit9_counter: std_logic_vector(8 downto 0);
 signal o_shiftreg: std_logic_vector(7 downto 0);
 
-signal i_convolute: std_logic;
-signal o_convolute: std_logic_vector(1 downto 0);
-type convolute_state is (S0, S1, S2, S3);
-signal convolute_cur_state: convolute_state;
-signal convolute_next_state: convolute_state;
-
-signal read_addr: std_logic_vector(7 downto 0);
+signal read_addr: std_logic_vector(15 downto 0);
 signal write_addr: std_logic_vector(15 downto 0);
+
+signal i_conv: std_logic;
+signal o_conv: std_logic_vector(1 downto 0);
+type conv_state is (S0, S1, S2, S3);
+signal conv_cur_state, conv_next_state: conv_state;
 begin
-    convolute_clk <= convolute_start and i_clk;
-    convolute_w <= o_bit3_counter(1) and (not o_bit3_counter(0));
-    convolute_next <= o_bit3_counter(2) and o_bit3_counter(1) and (not o_bit3_counter(0));
+    conv_clk <= i_clk and conv_start;
+    count_clk <= i_clk and count_start;
+    rst <= i_rst or conv_rst;
+    
+    conv_w <= o_bit3_counter(1) and o_bit3_counter(0);
+    conv_next <= o_bit3_counter(2) and o_bit3_counter(1) and o_bit3_counter(0);
 
     o_data <= o_shiftreg;
-    o_done <= std_logic(o_total = o_bit9_counter(8 downto 1));
+    o_end <= std_logic(o_total = o_bit9_counter(8 downto 1));
 
     read_addr <= "00000000" & std_logic_vector(unsigned(o_bit9_counter(8 downto 1)) + 1);
     write_addr <= std_logic_vector(unsigned(o_bit9_counter) + 999);
-    with address_sel select
+    with addr_sel select
         o_address <= "0000000000000000" when "00",
                      read_addr when "01",
                      write_addr when "10",
                      "XXXXXXXXXXXXXXXX" when others;
 
     with o_bit3_counter select
-        i_convolute <= o_word(0) when "000",
-                       o_word(1) when "001",
-                       o_word(2) when "010",
-                       o_word(3) when "011",
-                       o_word(4) when "100",
-                       o_word(5) when "101",
-                       o_word(6) when "110",
-                       o_word(7) when "111",
-                       'X' when others;
+        i_conv <= o_word(0) when "000",
+                  o_word(1) when "001",
+                  o_word(2) when "010",
+                  o_word(3) when "011",
+                  o_word(4) when "100",
+                  o_word(5) when "101",
+                  o_word(6) when "110",
+                  o_word(7) when "111",
+                  'X' when others;
 
     total: process(i_clk, i_rst)
     begin
         if (i_rst = '1') then
             o_total <= "00000000";
         elsif (i_clk'event and i_clk = '1') then
-            if (total_load = '1') then
+            if (t_load = '1') then
                 o_total <= i_data;
             end if;
         end if;
@@ -107,26 +113,26 @@ begin
         if (i_rst = '1') then
             o_word <= "00000000";
         elsif (i_clk'event and i_clk = '1') then
-            if (word_load = '1') then
+            if (w_load = '1') then
                 o_word <= i_data;
             end if;
         end if;
     end process;
 
-    bit3_counter: process(convolute_clk, convolute_rst)
+    bit3_counter: process(count_clk, rst)
     begin
-        if (convolute_rst = '1') then
+        if (rst = '1') then
             o_bit3_counter <= "000";
-        elsif (convolute_clk'event and convolute_clk = '1') then
+        elsif (count_clk'event and count_clk = '1') then
             o_bit3_counter <= std_logic_vector(unsigned(o_bit3_counter) + 1);
         end if;
     end process;
 
-    bit9_counter: process(convolute_w, i_rst)
+    bit9_counter: process(conv_w, rst)
     begin
-        if (i_rst = '1') then
+        if (rst = '1') then
             o_bit9_counter <= "000000000";
-        elsif (convolute_w'event and convolute_w = '1') then
+        elsif (conv_w'event and conv_w = '1') then
             o_bit9_counter <= std_logic_vector(unsigned(o_bit9_counter) + 1);
         end if;
     end process;
@@ -136,56 +142,56 @@ begin
         if (i_rst = '1') then
             o_shiftreg <= "00000000";
         elsif (i_clk'event and i_clk = '1') then
-            o_shiftreg <= o_convolute & o_shiftreg(7 downto 2);
+            o_shiftreg <= o_conv & o_shiftreg(7 downto 2);
         end if;
     end process;
 
     ---- convolution state machine ----
-    convolute_reg: process (convolute_clk, convolute_rst)
+    conv_reg: process (conv_clk, rst)
     begin
-        if(convolute_rst = '1') then
-            convolute_cur_state <= S0;
-        elsif convolute_clk'event and convolute_clk = '1' then
-            convolute_cur_state <= convolute_next_state;
+        if(rst = '1') then
+            conv_cur_state <= S0;
+        elsif conv_clk'event and conv_clk = '1' then
+            conv_cur_state <= conv_next_state;
         end if;
     end process;
 
-    convolute_next_out: process(convolute_cur_state, i_convolute)
+    conv_next_out: process(conv_cur_state, i_conv)
     begin
-        convolute_next_state  <= convolute_cur_state;
-        case convolute_cur_state is
+        conv_next_state  <= conv_cur_state;
+        case conv_cur_state is
             when S0 =>
-                if (i_convolute = '0') then
-                    convolute_next_state <= S0;
-                    o_convolute <= "00";
-                elsif (i_convolute = '1') then
-                    convolute_next_state <= S2;
-                    o_convolute <= "11";
+                if (i_conv = '0') then
+                    conv_next_state <= S0;
+                    o_conv <= "00";
+                elsif (i_conv = '1') then
+                    conv_next_state <= S2;
+                    o_conv <= "11";
                 end if;
             when S1 =>
-                if (i_convolute = '0') then
-                    convolute_next_state <= S0;
-                    o_convolute <= "11";
-                elsif (i_convolute = '1') then
-                    convolute_next_state <= S2;
-                    o_convolute <= "00";
+                if (i_conv = '0') then
+                    conv_next_state <= S0;
+                    o_conv <= "11";
+                elsif (i_conv = '1') then
+                    conv_next_state <= S2;
+                    o_conv <= "00";
                 end if;
             when S2 =>
-                if (i_convolute = '0') then
-                    convolute_next_state <= S1;
-                    o_convolute <= "01";
-                elsif (i_convolute = '1') then
-                    convolute_next_state <= S3;
-                    o_convolute <= "10";
+                if (i_conv = '0') then
+                    conv_next_state <= S1;
+                    o_conv <= "01";
+                elsif (i_conv = '1') then
+                    conv_next_state <= S3;
+                    o_conv <= "10";
                 end if;
             when S3 =>
-                if (i_convolute = '0') then
-                    convolute_next_state <= S1;
-                    o_convolute <= "10";
-                elsif (i_convolute = '1') then
-                    convolute_next_state <= S3;
-                    o_convolute <= "01";
+                if (i_conv = '0') then
+                    conv_next_state <= S1;
+                    o_conv <= "10";
+                elsif (i_conv = '1') then
+                    conv_next_state <= S3;
+                    o_conv <= "01";
                 end if;
         end case;
     end process;
-end Behavioral;
+end Behavioural;
