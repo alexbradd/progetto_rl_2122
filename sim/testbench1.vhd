@@ -17,7 +17,7 @@ component project_reti_logiche is
         o_done    : out std_logic;
         o_en      : out std_logic;
         o_we      : out std_logic;
-        o_data    : in std_logic_vector(7 downto 0)
+        o_data    : out std_logic_vector(7 downto 0)
     );
 end component;
 constant c_CLOCK_PERIOD         : time := 100 ns;
@@ -33,10 +33,10 @@ signal   mem_we                 : std_logic;
 type ram_type is array (65535 downto 0) of std_logic_vector(7 downto 0);
 
 -- Preloaded RAM TODO
-signal RAM: ram_type ; -- := (0 => std_logic_vector(to_unsigned(2, 8)),
-                       -- 1 => std_logic_vector(to_unsigned(162, 8)),
-                       -- 2 => std_logic_vector(to_unsigned(75, 8)), 
-                       -- others => (others => '0'));
+signal RAM: ram_type := (0 => std_logic_vector(to_unsigned(2, 8)),
+                         1 => std_logic_vector(to_unsigned(162, 8)),
+                         2 => std_logic_vector(to_unsigned(75, 8)), 
+                         others => (others => '0'));
 begin
     CMP: project_reti_logiche port map (
         i_clk     => tb_clk,
@@ -72,6 +72,29 @@ begin
     
     TEST: process
     begin
-    -- TODO
+        tb_start <= '0';
+        wait for 100 ns;
+        wait for c_CLOCK_PERIOD;
+        tb_rst <= '1';
+        wait for c_CLOCK_PERIOD;
+        wait for 100 ns;
+        tb_rst <= '0';
+        wait for c_CLOCK_PERIOD;
+        wait for 100 ns;
+        tb_start <= '1';
+        wait for c_CLOCK_PERIOD;
+        wait until tb_done = '1';
+        wait for c_CLOCK_PERIOD;
+        tb_start <= '0';
+        wait until tb_done = '0';
+        wait for 100 ns;
+        
+        assert RAM(1000) = std_logic_vector(to_unsigned(209, 8)) report "TEST FALLITO (ENCODE). Expected 209 found" & integer'image(to_integer(unsigned(RAM(1000)))) severity failure;
+        assert RAM(1001) = std_logic_vector(to_unsigned(205, 8)) report "TEST FALLITO (ENCODE). Expected 205 found" & integer'image(to_integer(unsigned(RAM(1001)))) severity failure;
+        assert RAM(1002) = std_logic_vector(to_unsigned(247, 8)) report "TEST FALLITO (ENCODE). Expected 247 found" & integer'image(to_integer(unsigned(RAM(1002)))) severity failure;
+        assert RAM(1003) = std_logic_vector(to_unsigned(210, 8)) report "TEST FALLITO (ENCODE). Expected 210 found" & integer'image(to_integer(unsigned(RAM(1003)))) severity failure;
+        assert RAM(1004) = std_logic_vector(to_unsigned(0, 8))   report "TEST FALLITO (POST_ENCODE). Expected 0 found" & integer'image(to_integer(unsigned(RAM(1004)))) severity failure;
+        
+        assert false report "Simulation Ended! TEST PASSATO (ENCODE_EXAMPLE)" severity failure;
     end process;
 end architecture;
