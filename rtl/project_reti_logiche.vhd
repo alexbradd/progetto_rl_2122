@@ -13,7 +13,7 @@ entity project_reti_logiche is
         o_done    : out std_logic;
         o_en      : out std_logic;
         o_we      : out std_logic;
-        o_data    : in std_logic_vector(7 downto 0)
+        o_data    : out std_logic_vector(7 downto 0)
     );
 end project_reti_logiche;
 
