@@ -283,8 +283,10 @@ begin
     begin
         if (rst = '1') then
             o_bit3_counter <= "111";
-        elsif (i_clk'event and i_clk = '1' and conv_start = '1') then
-            o_bit3_counter <= o_bit3_counter + 1;
+        elsif (i_clk'event and i_clk = '1') then
+            if (conv_start = '1') then
+                o_bit3_counter <= o_bit3_counter + 1;
+            end if;
         end if;
     end process;
 
@@ -311,8 +313,10 @@ begin
     begin
         if(rst = '1') then
             conv_cur_state <= S0;
-        elsif (i_clk'event and i_clk = '1' and conv_start = '1') then
-            conv_cur_state <= conv_next_state;
+        elsif (i_clk'event and i_clk = '1') then
+            if (conv_start = '1') then
+                conv_cur_state <= conv_next_state;
+            end if;
         end if;
     end process;
 
