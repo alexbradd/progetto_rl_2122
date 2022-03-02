@@ -219,7 +219,7 @@ begin
             when S7 =>
                 if (i_start = '0') then
                     next_state <= S0;
-                    o_done <= '0';
+                    o_done <= '1';
                     addr_sel <= "--";
                     t_load <= '0';
                     w_load <= '0';
