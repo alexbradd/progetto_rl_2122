@@ -27,7 +27,6 @@ component datapath is
         t_load: in std_logic;
         w_load: in std_logic;
         conv_start: in std_logic;
-        count_start: in std_logic;
         conv_rst: in std_logic;
         conv_w: out std_logic;
         conv_next: out std_logic;
@@ -40,7 +39,6 @@ signal addr_sel: std_logic_vector(1 downto 0);
 signal t_load: std_logic;
 signal w_load: std_logic;
 signal conv_start: std_logic;
-signal count_start: std_logic;
 signal conv_rst: std_logic;
 signal conv_w: std_logic;
 signal conv_next: std_logic;
@@ -50,7 +48,7 @@ type state is (S0, S1, S2, S3, S4, S5, S6, S7);
 signal cur_state, next_state: state;
 begin
     dp: datapath port map(
-        i_clk, i_rst, i_data, addr_sel, t_load, w_load, conv_start, count_start,
+        i_clk, i_rst, i_data, addr_sel, t_load, w_load, conv_start,
         conv_rst, conv_w, conv_next, o_address, o_end, o_data
     );
 
@@ -71,7 +69,6 @@ begin
         t_load <= '0';
         w_load <= '0';
         conv_start <= '0';
-        count_start <= '0';
         conv_rst <= '0';
         o_en <= '0';
         o_we <= '-';
@@ -84,7 +81,6 @@ begin
                     t_load <= '0';
                     w_load <= '0';
                     conv_start <= '0';
-                    count_start <= '0';
                     conv_rst <= '1';
                     o_en <= '0';
                     o_we <= '-';
@@ -95,7 +91,6 @@ begin
                     t_load <= '0';
                     w_load <= '0';
                     conv_start <= '0';
-                    count_start <= '0';
                     conv_rst <= '1';
                     o_en <= '1';
                     o_we <= '0';
@@ -107,7 +102,6 @@ begin
                     t_load <= '1';
                     w_load <= '0';
                     conv_start <= '0';
-                    count_start <= '0';
                     conv_rst <= '0';
                     o_en <= '1';
                     o_we <= '0';
@@ -119,7 +113,6 @@ begin
                         t_load <= '0';
                         w_load <= '1';
                         conv_start <= '1';
-                        count_start <= '1';
                         conv_rst <= '0';
                         o_en <= '0';
                         o_we <= '-';
@@ -130,7 +123,6 @@ begin
                         t_load <= '0';
                         w_load <= '0';
                         conv_start <= '0';
-                        count_start <= '0';
                         conv_rst <= '0';
                         o_en <= '0';
                         o_we <= '-';
@@ -143,7 +135,6 @@ begin
                     t_load <= '0';
                     w_load <= '0';
                     conv_start <= '1';
-                    count_start <= '1';
                     conv_rst <= '0';
                     o_en <= '0';
                     o_we <= '-';
@@ -154,7 +145,6 @@ begin
                     t_load <= '0';
                     w_load <= '0';
                     conv_start <= '1';
-                    count_start <= '1';
                     conv_rst <= '0';
                     o_en <= '0';
                     o_we <= '-';
@@ -165,7 +155,6 @@ begin
                     t_load <= '0';
                     w_load <= '0';
                     conv_start <= '0';
-                    count_start <= '0';
                     conv_rst <= '0';
                     o_en <= '0';
                     o_we <= '-';
@@ -177,7 +166,6 @@ begin
                 t_load <= '0';
                 w_load <= '0';
                 conv_start <= '1';
-                count_start <= '1';
                 conv_rst <= '0';
                 o_en <= '1';
                 o_we <= '1';
@@ -189,7 +177,6 @@ begin
                     t_load <= '0';
                     w_load <= '0';
                     conv_start <= '0';
-                    count_start <= '0';
                     conv_rst <= '0';
                     o_en <= '1';
                     o_we <= '1';
@@ -200,7 +187,6 @@ begin
                     t_load <= '0';
                     w_load <= '0';
                     conv_start <= '0';
-                    count_start <= '0';
                     conv_rst <= '0';
                     o_en <= '1';
                     o_we <= '1';
@@ -212,7 +198,6 @@ begin
                 t_load <= '0';
                 w_load <= '0';
                 conv_start <= '0';
-                count_start <= '0';
                 conv_rst <= '0';
                 o_en <= '1';
                 o_we <= '0';
@@ -224,7 +209,6 @@ begin
                     t_load <= '0';
                     w_load <= '0';
                     conv_start <= '0';
-                    count_start <= '0';
                     conv_rst <= '1';
                     o_en <= '0';
                     o_we <= '-';
@@ -235,7 +219,6 @@ begin
                     t_load <= '0';
                     w_load <= '0';
                     conv_start <= '0';
-                    count_start <= '0';
                     conv_rst <= '1';
                     o_en <= '0';
                     o_we <= '-';
@@ -261,7 +244,6 @@ entity datapath is
         t_load: in std_logic;
         w_load: in std_logic;
         conv_start: in std_logic;
-        count_start: in std_logic;
         conv_rst: in std_logic;
         conv_w: out std_logic;
         conv_next: out std_logic;
@@ -340,7 +322,7 @@ begin
     begin
         if (rst = '1') then
             o_bit3_counter <= "111";
-        elsif (i_clk'event and i_clk = '1' and count_start = '1') then
+        elsif (i_clk'event and i_clk = '1' and conv_start = '1') then
             o_bit3_counter <= o_bit3_counter + 1;
         end if;
     end process;
