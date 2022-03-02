@@ -32,7 +32,7 @@ signal   mem_we                 : std_logic;
 
 type ram_type is array (65535 downto 0) of std_logic_vector(7 downto 0);
 
--- Preloaded RAM TODO
+-- Preloaded RAM 
 signal RAM: ram_type := (0 => std_logic_vector(to_unsigned(2, 8)),
                          1 => std_logic_vector(to_unsigned(162, 8)),
                          2 => std_logic_vector(to_unsigned(75, 8)), 
@@ -89,12 +89,29 @@ begin
         wait until tb_done = '0';
         wait for 100 ns;
         
-        assert RAM(1000) = std_logic_vector(to_unsigned(209, 8)) report "TEST FALLITO (ENCODE). Expected 209 found" & integer'image(to_integer(unsigned(RAM(1000)))) severity failure;
-        assert RAM(1001) = std_logic_vector(to_unsigned(205, 8)) report "TEST FALLITO (ENCODE). Expected 205 found" & integer'image(to_integer(unsigned(RAM(1001)))) severity failure;
-        assert RAM(1002) = std_logic_vector(to_unsigned(247, 8)) report "TEST FALLITO (ENCODE). Expected 247 found" & integer'image(to_integer(unsigned(RAM(1002)))) severity failure;
-        assert RAM(1003) = std_logic_vector(to_unsigned(210, 8)) report "TEST FALLITO (ENCODE). Expected 210 found" & integer'image(to_integer(unsigned(RAM(1003)))) severity failure;
-        assert RAM(1004) = std_logic_vector(to_unsigned(0, 8))   report "TEST FALLITO (POST_ENCODE). Expected 0 found" & integer'image(to_integer(unsigned(RAM(1004)))) severity failure;
+        assert RAM(1000) = std_logic_vector(to_unsigned(209, 8))
+            report "E:1000 Expected 209 found" & 
+                integer'image(to_integer(unsigned(RAM(1000))))
+            severity failure;
+        assert RAM(1001) = std_logic_vector(to_unsigned(205, 8))
+            report "E:1001 Expected 205 found" & 
+                integer'image(to_integer(unsigned(RAM(1001))))
+            severity failure;
+        assert RAM(1002) = std_logic_vector(to_unsigned(247, 8)) 
+            report "E:1002 Expected 247 found" & 
+                integer'image(to_integer(unsigned(RAM(1002))))
+            severity failure;
+        assert RAM(1003) = std_logic_vector(to_unsigned(210, 8))
+            report "E:1003 Expected 210 found" &
+                integer'image(to_integer(unsigned(RAM(1003))))
+            severity failure;
+        assert RAM(1004) = std_logic_vector(to_unsigned(0, 8))
+            report "E:1004 Expected 0 found" &
+                integer'image(to_integer(unsigned(RAM(1004))))
+            severity failure;
         
-        assert false report "Simulation Ended! TEST PASSATO (ENCODE_EXAMPLE)" severity failure;
+        assert false
+            report "Simulation Ended! TEST PASSATO"
+            severity failure;
     end process;
 end architecture;
