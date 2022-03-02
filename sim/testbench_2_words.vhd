@@ -3,10 +3,10 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.std_logic_unsigned.all;
 
-entity testbench1 is
-end testbench1;
+entity testbench_2_words is
+end testbench_2_words;
 
-architecture Behavioural of testbench1 is
+architecture Behavioural of testbench_2_words is
 component project_reti_logiche is
     port(
         i_clk     : in std_logic;
