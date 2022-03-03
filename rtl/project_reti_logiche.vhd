@@ -104,37 +104,34 @@ begin
                     o_done <= '0';
                     addr_sel <= "--";
                     t_load <= '0';
+                    conv_start <= '0';
                     conv_rst <= '0';
                     o_en <= '0';
                     o_we <= '-';
                     if (o_end = '0') then
                         next_state <= S3;
                         w_load <= '1';
-                        conv_start <= '1';
                     elsif (o_end = '1') then
                         next_state <= S7;
                         w_load <= '0';
-                        conv_start <= '0';
                     end if;
             when S3 =>
                 o_done <= '0';
                 t_load <= '0';
                 w_load <= '0';
+                conv_start <= '1';
                 conv_rst <= '0';
                 o_en <= '0';
                 o_we <= '-';
                 if (conv_w = '0' and conv_next = '0') then
                     next_state <= S3;
                     addr_sel <= "--";
-                    conv_start <= '1';
                 elsif (conv_w = '1' and conv_next = '0') then
                     next_state <= S4;
                     addr_sel <= "11";
-                    conv_start <= '1';
                 elsif (conv_w = '1' and conv_next = '1') then
                     next_state <= S5;
                     addr_sel <= "11";
-                    conv_start <= '0';
                 end if;
             when S4 =>
                 next_state <= S3;
@@ -282,7 +279,7 @@ begin
     bit3_counter: process(i_clk, rst)
     begin
         if (rst = '1') then
-            o_bit3_counter <= "111";
+            o_bit3_counter <= "000";
         elsif (i_clk'event and i_clk = '1') then
             if (conv_start = '1') then
                 o_bit3_counter <= o_bit3_counter + 1;
