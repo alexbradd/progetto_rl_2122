@@ -215,7 +215,7 @@ architecture Behavioural of datapath is
 signal rst: std_logic;
 
 signal o_total: std_logic_vector(7 downto 0);
-signal o_word: std_logic_vector(0 to 7);
+signal o_word: std_logic_vector(7 downto 0);
 
 signal pre_conv_w: std_logic;
 
@@ -243,17 +243,6 @@ begin
                      (o_bit9_counter + "0000001111100111") when "11", -- +999
                      "XXXXXXXXXXXXXXXX" when others;
 
-    with o_bit3_counter select
-        i_conv <= o_word(0) when "000",
-                  o_word(1) when "001",
-                  o_word(2) when "010",
-                  o_word(3) when "011",
-                  o_word(4) when "100",
-                  o_word(5) when "101",
-                  o_word(6) when "110",
-                  o_word(7) when "111",
-                  'X' when others;
-
     total: process(i_clk, i_rst)
     begin
         if (i_rst = '1') then
@@ -265,13 +254,17 @@ begin
         end if;
     end process;
 
-    word: process(i_clk, i_rst)
+    word_shiftreg: process(i_clk, i_rst)
     begin
         if (i_rst = '1') then
             o_word <= "00000000";
         elsif (i_clk'event and i_clk = '1') then
             if (w_load = '1') then
-                o_word <= i_data;
+                i_conv <= i_data(7);
+                o_word <= i_data(6 downto 0) & '0';
+            elsif (w_load = '0') then
+                i_conv <= o_word(7);
+                o_word <= o_word(6 downto 0) & '0';
             end if;
         end if;
     end process;
@@ -296,7 +289,7 @@ begin
         end if;
     end process;
 
-    shiftreg: process(i_clk, i_rst)
+    out_shiftreg: process(i_clk, i_rst)
     begin
         if (i_rst = '1') then
             o_shiftreg <= "00000000";
