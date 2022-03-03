@@ -41,6 +41,26 @@ signal RAM: ram_type := (0 => std_logic_vector(to_unsigned(6, 8)),
                          5 => std_logic_vector(to_unsigned(67, 8)), 
                          6 => std_logic_vector(to_unsigned(13, 8)), 
                          others => (others => '0'));
+signal TARGET_RAM: ram_type := (0 => std_logic_vector(to_unsigned(6, 8)),
+                                1 => std_logic_vector(to_unsigned(163, 8)),
+                                2 => std_logic_vector(to_unsigned(47, 8)), 
+                                3 => std_logic_vector(to_unsigned(4, 8)), 
+                                4 => std_logic_vector(to_unsigned(64, 8)), 
+                                5 => std_logic_vector(to_unsigned(67, 8)), 
+                                6 => std_logic_vector(to_unsigned(13, 8)),
+                                1000 => std_logic_vector(to_unsigned(209, 8)),
+                                1001 => std_logic_vector(to_unsigned(206, 8)),
+                                1002 => std_logic_vector(to_unsigned(189, 8)),
+                                1003 => std_logic_vector(to_unsigned(37, 8)),
+                                1004 => std_logic_vector(to_unsigned(176, 8)),
+                                1005 => std_logic_vector(to_unsigned(55, 8)),
+                                1006 => std_logic_vector(to_unsigned(55, 8)),
+                                1007 => std_logic_vector(to_unsigned(0, 8)),
+                                1008 => std_logic_vector(to_unsigned(55, 8)),
+                                1009 => std_logic_vector(to_unsigned(14, 8)),
+                                1010 => std_logic_vector(to_unsigned(176, 8)),
+                                1011 => std_logic_vector(to_unsigned(232, 8)),
+                                others => (others => '0'));
 begin
     CMP: project_reti_logiche port map (
         i_clk     => tb_clk,
@@ -93,58 +113,14 @@ begin
         wait until tb_done = '0';
         wait for 100 ns;
         
-        assert RAM(1000) = std_logic_vector(to_unsigned(209, 8))
-            report "E:1000 Expected 209 found" & 
-                integer'image(to_integer(unsigned(RAM(1000))))
+        for I in 0 to 65535 loop
+            assert RAM(I) = TARGET_RAM(I)
+                report "Error: Expected " & 
+                    integer'image(to_integer(unsigned(TARGET_RAM(I)))) & 
+                    " found " & 
+                    integer'image(to_integer(unsigned(RAM(I))))
             severity failure;
-        assert RAM(1001) = std_logic_vector(to_unsigned(206, 8))
-            report "E:1001 Expected 206 found" & 
-                integer'image(to_integer(unsigned(RAM(1001))))
-            severity failure;
-        assert RAM(1002) = std_logic_vector(to_unsigned(189, 8)) 
-            report "E:1002 Expected 189 found" & 
-                integer'image(to_integer(unsigned(RAM(1002))))
-            severity failure;
-        assert RAM(1003) = std_logic_vector(to_unsigned(37, 8))
-            report "E:1003 Expected 37 found" &
-                integer'image(to_integer(unsigned(RAM(1003))))
-            severity failure;
-        assert RAM(1004) = std_logic_vector(to_unsigned(176, 8))
-            report "E:1004 Expected 176 found" &
-                integer'image(to_integer(unsigned(RAM(1004))))
-            severity failure;
-        assert RAM(1005) = std_logic_vector(to_unsigned(55, 8))
-            report "E:1005 Expected 55 found" &
-                integer'image(to_integer(unsigned(RAM(1005))))
-            severity failure;
-        assert RAM(1006) = std_logic_vector(to_unsigned(55, 8))
-            report "E:1006 Expected 55 found" &
-                integer'image(to_integer(unsigned(RAM(1006))))
-            severity failure;
-        assert RAM(1007) = std_logic_vector(to_unsigned(0, 8))
-            report "E:1007 Expected 0 found" &
-                integer'image(to_integer(unsigned(RAM(1007))))
-            severity failure;      
-        assert RAM(1008) = std_logic_vector(to_unsigned(55, 8))
-            report "E:1008 Expected 55 found" &
-                integer'image(to_integer(unsigned(RAM(1008))))
-            severity failure;      
-        assert RAM(1009) = std_logic_vector(to_unsigned(14, 8))
-            report "E:1009 Expected 14 found" &
-                integer'image(to_integer(unsigned(RAM(1009))))
-            severity failure;      
-        assert RAM(1010) = std_logic_vector(to_unsigned(176, 8))
-            report "E:1010 Expected 176 found" &
-                integer'image(to_integer(unsigned(RAM(1010))))
-            severity failure;      
-        assert RAM(1011) = std_logic_vector(to_unsigned(232, 8))
-            report "E:1011 Expected 232 found" &
-                integer'image(to_integer(unsigned(RAM(1011))))
-            severity failure;      
-        assert RAM(1012) = std_logic_vector(to_unsigned(0, 8))
-            report "E:1012 Expected 0 found" &
-                integer'image(to_integer(unsigned(RAM(1012))))
-            severity failure;      
+        end loop;
 
         assert false
             report "Simulation Ended! TEST PASSATO"
