@@ -221,7 +221,7 @@ signal pre_conv_w: std_logic;
 
 signal o_bit3_counter: std_logic_vector(2 downto 0);
 signal o_bit9_counter: std_logic_vector(8 downto 0);
-signal o_shiftreg: std_logic_vector(0 to 7);
+signal o_shiftreg: std_logic_vector(7 downto 0);
 
 signal i_conv: std_logic;
 signal o_conv: std_logic_vector(1 downto 0);
@@ -294,7 +294,7 @@ begin
         if (i_rst = '1') then
             o_shiftreg <= "00000000";
         elsif (i_clk'event and i_clk = '1') then
-            o_shiftreg <= o_shiftreg(2 to 7) & o_conv;
+            o_shiftreg <= o_shiftreg(5 downto 0) & o_conv;
         end if;
     end process;
 
