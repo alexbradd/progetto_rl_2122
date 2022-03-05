@@ -218,6 +218,7 @@ signal o_total: std_logic_vector(7 downto 0);
 signal o_word: std_logic_vector(7 downto 0);
 
 signal pre_conv_w: std_logic;
+signal pre_conv_next: std_logic;
 
 signal o_bit3_counter: std_logic_vector(2 downto 0);
 signal o_bit9_counter: std_logic_vector(8 downto 0);
@@ -231,11 +232,13 @@ begin
     rst <= i_rst or conv_rst;
 
     pre_conv_w <= o_bit3_counter(1) and o_bit3_counter(0);
+    pre_conv_next <= o_bit3_counter(2) and o_bit3_counter(1) and o_bit3_counter(0);
+
     conv_w <= pre_conv_w;
-    conv_next <= o_bit3_counter(2) and o_bit3_counter(1) and o_bit3_counter(0);
+    conv_next <= pre_conv_next;
 
     o_data <= o_shiftreg;
-    o_end <= '1' when o_total = o_bit9_counter(8 downto 1) else '0';
+    o_end <= '1' when o_total = 0 else '0';
 
     with addr_sel select
         o_address <= "0000000000000000" when "00",
@@ -250,6 +253,8 @@ begin
         elsif (i_clk'event and i_clk = '1') then
             if (t_load = '1') then
                 o_total <= i_data;
+            elsif (t_load = '0' and pre_conv_next = '1') then
+                o_total <= o_total - 1;
             end if;
         end if;
     end process;
