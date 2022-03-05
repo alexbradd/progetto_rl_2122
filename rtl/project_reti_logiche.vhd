@@ -243,9 +243,9 @@ begin
                      (o_bit9_counter + "0000001111100111") when "11", -- +999
                      "XXXXXXXXXXXXXXXX" when others;
 
-    total: process(i_clk, i_rst)
+    total: process(i_clk, rst)
     begin
-        if (i_rst = '1') then
+        if (rst = '1') then
             o_total <= "00000000";
         elsif (i_clk'event and i_clk = '1') then
             if (t_load = '1') then
@@ -254,9 +254,9 @@ begin
         end if;
     end process;
 
-    word_shiftreg: process(i_clk, i_rst)
+    word_shiftreg: process(i_clk, rst)
     begin
-        if (i_rst = '1') then
+        if (rst = '1') then
             o_word <= "00000000";
         elsif (i_clk'event and i_clk = '1') then
             if (w_load = '1') then
@@ -289,9 +289,9 @@ begin
         end if;
     end process;
 
-    out_shiftreg: process(i_clk, i_rst)
+    out_shiftreg: process(i_clk, rst)
     begin
-        if (i_rst = '1') then
+        if (rst = '1') then
             o_shiftreg <= "00000000";
         elsif (i_clk'event and i_clk = '1') then
             o_shiftreg <= o_shiftreg(5 downto 0) & o_conv;
