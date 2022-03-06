@@ -1,0 +1,24 @@
+Test 0:
+  size: 2
+  input: 185 220
+  expected output: 210 111 152 155
+Test 1:
+  size: 3
+  input: 176 172 75
+  expected output: 210 176 209 43 55 210
+Test 2:
+  size: 0
+  input: 
+  expected output: 
+Test 3:
+  size: 0
+  input: 
+  expected output: 
+Test 4:
+  size: 4
+  input: 44 118 24 17
+  expected output: 13 43 57 138 195 172 3 115
+Test 5:
+  size: 4
+  input: 211 37 251 204
+  expected output: 232 126 189 244 149 98 91 235
