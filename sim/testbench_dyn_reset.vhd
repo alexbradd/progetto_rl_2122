@@ -93,9 +93,9 @@ begin
             elsif (enable_wire = '1') then
                 if (mem_we = '1') then
                     RAM(conv_integer(mem_address))  <= mem_i_data;
-                    mem_o_data                      <= mem_i_data after 1 ns;
+                    mem_o_data                      <= mem_i_data after 2 ns;
                 else
-                    mem_o_data <= RAM(conv_integer(mem_address)) after 1 ns;
+                    mem_o_data <= RAM(conv_integer(mem_address)) after 2 ns;
                 end if;
             end if;
         end if;
