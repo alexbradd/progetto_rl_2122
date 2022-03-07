@@ -18,34 +18,34 @@ entity project_reti_logiche is
 end project_reti_logiche;
 
 architecture Behavioural of project_reti_logiche is
-component datapath is
-    port(
-        i_clk: in std_logic;
-        i_rst: in std_logic;
-        i_data: in std_logic_vector(7 downto 0);
-        addr_sel: in std_logic_vector(1 downto 0);
-        t_load: in std_logic;
-        w_load: in std_logic;
-        conv_start: in std_logic;
-        conv_rst: in std_logic;
-        conv_w: out std_logic;
-        conv_next: out std_logic;
-        o_address: out std_logic_vector(15 downto 0);
-        o_end: out std_logic;
-        o_data: out std_logic_vector(7 downto 0)
-    );
-end component;
-signal addr_sel: std_logic_vector(1 downto 0);
-signal t_load: std_logic;
-signal w_load: std_logic;
-signal conv_start: std_logic;
-signal conv_rst: std_logic;
-signal conv_w: std_logic;
-signal conv_next: std_logic;
-signal o_end : std_logic;
-
-type state is (S0, S1, S2, S3, S4, S5, S6, S7);
-signal cur_state, next_state: state;
+    component datapath is
+        port(
+            i_clk: in std_logic;
+            i_rst: in std_logic;
+            i_data: in std_logic_vector(7 downto 0);
+            addr_sel: in std_logic_vector(1 downto 0);
+            t_load: in std_logic;
+            w_load: in std_logic;
+            conv_start: in std_logic;
+            conv_rst: in std_logic;
+            conv_w: out std_logic;
+            conv_next: out std_logic;
+            o_address: out std_logic_vector(15 downto 0);
+            o_end: out std_logic;
+            o_data: out std_logic_vector(7 downto 0)
+        );
+    end component;
+    signal addr_sel: std_logic_vector(1 downto 0);
+    signal t_load: std_logic;
+    signal w_load: std_logic;
+    signal conv_start: std_logic;
+    signal conv_rst: std_logic;
+    signal conv_w: std_logic;
+    signal conv_next: std_logic;
+    signal o_end : std_logic;
+    
+    type state is (S0, S1, S2, S3, S4, S5, S6, S7);
+    signal cur_state, next_state: state;
 begin
     dp: datapath port map(
         i_clk, i_rst, i_data, addr_sel, t_load, w_load, conv_start,
@@ -212,22 +212,22 @@ entity datapath is
 end datapath;
 
 architecture Behavioural of datapath is
-signal rst: std_logic;
-
-signal o_total: std_logic_vector(7 downto 0);
-signal o_word: std_logic_vector(7 downto 0);
-
-signal pre_conv_w: std_logic;
-signal pre_conv_next: std_logic;
-
-signal o_bit3_counter: std_logic_vector(2 downto 0);
-signal o_bit9_counter: std_logic_vector(8 downto 0);
-signal o_shiftreg: std_logic_vector(7 downto 0);
-
-signal i_conv: std_logic;
-signal o_conv: std_logic_vector(1 downto 0);
-type conv_state is (S0, S1, S2, S3);
-signal conv_cur_state, conv_next_state: conv_state;
+    signal rst: std_logic;
+    
+    signal o_total: std_logic_vector(7 downto 0);
+    signal o_word: std_logic_vector(7 downto 0);
+    
+    signal pre_conv_w: std_logic;
+    signal pre_conv_next: std_logic;
+    
+    signal o_bit3_counter: std_logic_vector(2 downto 0);
+    signal o_bit9_counter: std_logic_vector(8 downto 0);
+    signal o_shiftreg: std_logic_vector(7 downto 0);
+    
+    signal i_conv: std_logic;
+    signal o_conv: std_logic_vector(1 downto 0);
+    type conv_state is (S0, S1, S2, S3);
+    signal conv_cur_state, conv_next_state: conv_state;
 begin
     rst <= i_rst or conv_rst;
 
