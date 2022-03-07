@@ -17,7 +17,7 @@ entity project_reti_logiche is
     );
 end project_reti_logiche;
 
-architecture Behavioural of project_reti_logiche is
+architecture arch of project_reti_logiche is
     component datapath is
         port(
             i_clk: in std_logic;
@@ -183,7 +183,7 @@ begin
                 end if;
         end case;
     end process;
-end Behavioural;
+end arch;
 
 -------------------------------------------------------------------------------
 -- Datapath
@@ -211,7 +211,7 @@ entity datapath is
     );
 end datapath;
 
-architecture Behavioural of datapath is
+architecture arch of datapath is
     signal rst: std_logic;
     
     signal o_total: std_logic_vector(7 downto 0);
@@ -353,4 +353,4 @@ begin
                 end if;
         end case;
     end process;
-end Behavioural;
+end arch;
