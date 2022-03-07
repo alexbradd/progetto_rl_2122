@@ -34,8 +34,9 @@ architecture Behavioural of testbench_dyn_restart is
     signal   enable_wire            : std_logic;
     signal   mem_we                 : std_logic;
     
-    type ram_type is array (65535 downto 0) of std_logic_vector(7 downto 0);
+    type ram_type is array (1600 downto 0) of std_logic_vector(7 downto 0);
     signal RAM: ram_type;
+    signal TARGET: ram_type;
     signal f_read: boolean := false;
     signal f_read_done: boolean := false;
     shared variable num: integer;
@@ -67,17 +68,25 @@ begin
             if (f_read) then
                 readline(input, l);
                 read(l, num);
+                for i in 0 to 1600 loop
+                    RAM(i) <= std_logic_vector(to_unsigned(0, 8));
+                    TARGET(i) <= std_logic_vector(to_unsigned(0, 8));
+                end loop;
+
                 RAM(0) <= std_logic_vector(to_unsigned(num, 8));
+                TARGET(0) <= std_logic_vector(to_unsigned(num, 8));
                 for i in 1 to num loop
                     readline(input, l);
                     read(l, n);
                     RAM(i) <= std_logic_vector(to_unsigned(n, 8));
+                    TARGET(i) <= std_logic_vector(to_unsigned(n, 8));
                 end loop;
                 for i in 0 to (2 * num - 1) loop
                     readline(input, l);
                     read(l, n);
-                    RAM(3000 + i) <= std_logic_vector(to_unsigned(n, 8));
+                    TARGET(1000 + i) <= std_logic_vector(to_unsigned(n, 8));
                 end loop;
+
                 if endfile(input) then
                     f_read_done <= true;
                 end if;
@@ -116,13 +125,13 @@ begin
             wait until tb_done = '0';
             wait for c_CLOCK_PERIOD;
             
-            for i in 0 to (2 * num - 1) loop
-                if (RAM(1000 + i) /= RAM(3000 + i)) then
+            for i in 0 to 1600 loop
+                if (RAM(i) /= TARGET(i)) then
                     passed := false;
                     report integer'image(count) & ") KO: at " &
-                        integer'image(1000 + i) & " expected " &
-                        integer'image(to_integer(unsigned(RAM(3000 + i)))) &
-                        " and found " & integer'image(to_integer(unsigned(RAM(1000 + i))))
+                        integer'image(i) & " expected " &
+                        integer'image(to_integer(unsigned(TARGET(i)))) &
+                        " and found " & integer'image(to_integer(unsigned(RAM(i))))
                         severity warning;
                     exit;
                 end if;
